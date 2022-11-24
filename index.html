@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <title>Mines-Sweeper</title>
+</head>
+
+<body onload="onInit()"  class="fill" style="background-image: url('https://picsum.photos/1920/1080');">
+    <table class="gameTable">
+        <h1 class="animate-charcter">Mines Sweeper!</h1>
+        <div class = "timer">00:00</div>
+        <button class = "resetBtn" onclick="resetGame()"></button>
+        <button class = "levelBtn beginner" onclick="onChooseLvl(this)">Beginner</button>
+        <button class = "levelBtn medium" onclick="onChooseLvl(this)">Medium</button>
+        <button class = "levelBtn expert" onclick="onChooseLvl(this)">Expert</button>
+
+        <tbody class="minesTable">
+        </tbody>
+    </table>
+    <div class="myName">This is me, vitamin C</div>
+
+
+    <script src="js/main.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
