@@ -2,7 +2,7 @@
 
 var gBoard = []
 var gLevel = { name: 'Medium' } //possible options: ['Beginner','Medium','Expert']
-var gGame = { isOn: false, shownCount: 0, markedCount: 0, secsPassed: 0, lives: 3, safeClickAvb: 3}
+var gGame = { isOn: false, shownCount: 0, markedCount: 0, secsPassed: 0, lives: 3, safeClickAvb: 3 }
 var steppedOnMineSound = new Audio('audio/pop.wav')
 var usedHintSound = new Audio('audio/breaking.wav')
 var gStartTime = null
@@ -10,6 +10,7 @@ var gIsVictory = false
 var gTimerIntervalId
 var gIsHintOn = false
 var gLastHintPos
+var gMoves = []
 
 const OFF_HINT = "<img src='img/bulb/off.png' alt='off Bulb' class='off' height='80px' width='80px'>"
 const ON_HINT = "<img src='img/bulb/on.png' alt='on Bulb' height='80px' width='80px'>"
@@ -109,10 +110,13 @@ function resetGame() {
     onInit()
 }
 
-function liveLose() {
-    steppedOnMineSound.play()
-    gGame.lives--
+function liveUpdate(isUndo = false) {
+    if (!isUndo) { steppedOnMineSound.play(); gGame.lives-- }
+    else gGame.lives++
     switch (gGame.lives) {
+        case 3:
+            document.querySelector(".lives").innerText = '❤️❤️❤️'
+            break
         case 2:
             document.querySelector(".lives").innerText = '☠️❤️❤️'
             break
@@ -126,12 +130,10 @@ function liveLose() {
 }
 
 function cellClicked(elCell, i, j) {
-    if (!gGame.isOn) return
     var currCell = gBoard[i][j]
-    if (currCell.isMarked) return
-    if (currCell.isRevealed) return
+    if (!gGame.isOn || currCell.isMarked || currCell.isRevealed) return
     if (gIsHintOn) { useHint(i, j); return }
-    if (!gStartTime) { //checks if this is the first click
+    if (!gStartTime) { //checks if this is the first click and start timer
         gStartTime = Date.now()
         timeStart()
         installMines(i, j)
@@ -139,19 +141,21 @@ function cellClicked(elCell, i, j) {
     }
     console.log(`you clicked on i:${i},j:${j}`)
     if (currCell.isMine) {
+        gMoves.push({ "location": currCell.location, "isMine": currCell.isMine, "mineNegs": currCell.mineNegs })
         renderCell(i, j, MINE)
         elCell.classList.add("lost")
-        liveLose()
+        liveUpdate()
         return
     }
     if (currCell.mineNegs === 0) {
+        gMoves.push({ "location": currCell.location, "isMine": currCell.isMine, "mineNegs": currCell.mineNegs })
         elCell.classList.add(`empty`)
         currCell.isRevealed = true
         gGame.shownCount++
         expandShown(elCell, i, j)
     }
     else {
-        console.log("this cell has " + currCell.mineNegs + " mines around it")
+        gMoves.push({ "location": currCell.location, "isMine": currCell.isMine, "mineNegs": currCell.mineNegs })
         renderCell(i, j, currCell.mineNegs)
         elCell.classList.add(`selectedBtn${currCell.mineNegs}`)
         currCell.isRevealed = true
@@ -279,7 +283,6 @@ function timerProcess() {
     gGame.secsPassed++
 }
 
-function timerStop() { }
 
 function gameOver() {
     clearInterval(gTimerIntervalId)
@@ -316,7 +319,7 @@ function getRanNums(max, amount) {
     }
     var shufflednums = nums.sort(() => (Math.random() > 0.5) ? 1 : -1)
     var ranNums = shufflednums.splice(0, amount)
-    if (amount===1) return ranNums[0]
+    if (amount === 1) return ranNums[0]
     return ranNums
 
 }
@@ -366,7 +369,7 @@ function safeClick() {
     //execute the safe click
     var unRevealedCells = getUnrevealedCells()
     console.log('unRevealedCells:', unRevealedCells)
-    var ranNum = getRanNums(unRevealedCells.length,1)
+    var ranNum = getRanNums(unRevealedCells.length, 1)
     console.log('ranNum:', ranNum)
     var safeClickCell = unRevealedCells[ranNum]
     console.log('safeClickCell:', safeClickCell)
@@ -378,18 +381,30 @@ function safeClick() {
 
 }
 
-function getUnrevealedCells (){
+function getUnrevealedCells() {
     var unRevealedCells = []
-    for (var i=0;i<gLevel.size;i++){
-        for (var j=0;j<gLevel.size;j++)
-        var currCell = gBoard[i][j]
+    for (var i = 0; i < gLevel.size; i++) {
+        for (var j = 0; j < gLevel.size; j++)
+            var currCell = gBoard[i][j]
         if (!currCell.isRevealed) unRevealedCells.push(currCell)
     }
     return unRevealedCells
 }
 
-function undo(){
-    console.log("coming soon")
+function undo() {
+    if (!gMoves.length) {console.log("no more undo moves available");return}
+    var undoCell = gMoves.pop()
+    var elUndoCell = document.querySelector(`.cell-${undoCell.location.i}-${undoCell.location.j}`)
+    var modelCell = gBoard[undoCell.location.i][undoCell.location.j]
+    //update Model
+    modelCell.isRevealed = false
+    //update DOM
+    elUndoCell.innerHTML = ''
+    var classes = ['lost','empty',`selectedBtn${modelCell.mineNegs}`]
+    elUndoCell.classList.remove(...classes)
+    //update Lives
+    if (modelCell.isMine) liveUpdate(true)
+
 }
 
 
