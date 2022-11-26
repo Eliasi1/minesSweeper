@@ -9,19 +9,33 @@
     <title>Mines-Sweeper</title>
 </head>
 
-<body onload="onInit()"  class="fill" style="background-image: url('https://picsum.photos/1920/1080');">
-    <table class="gameTable">
-        <h1 class="animate-charcter">Mines Sweeper!</h1>
-        <div class = "timer">00:00</div>
-        <button class = "resetBtn" onclick="resetGame()"></button>
-        <button class = "levelBtn beginner" onclick="onChooseLvl(this)">Beginner</button>
-        <button class = "levelBtn medium" onclick="onChooseLvl(this)">Medium</button>
-        <button class = "levelBtn expert" onclick="onChooseLvl(this)">Expert</button>
-
-        <tbody class="minesTable">
-        </tbody>
-    </table>
-    <div class="myName">This is me, vitamin C</div>
+<body onload="onInit()" style="background-image: url('https://picsum.photos/1920/1080');">
+    <div class="wrapper">
+        <h1 class="animate-charcter">Mines Sweeper!</h1><br>
+        <div class ="records table">Best records (in seconds) for game levels: <br>Beginner - <span class="beginnerRecord">0000</span> seconds!<br>Medium - <span class="mediumRecord">0000</span> seconds!<br>Expert - <span class="expertRecord">0000</span> seconds!</div>
+        <div class="table optionsTable">
+            <div class="timer">00:00</div>
+            <button class="resetBtn" onclick="resetGame()"></button>
+            <div class="lives">❤️❤️❤️</div>
+            <button class="levelBtn beginner" onclick="onChooseLvl(this)">Beginner</button>
+            <button class="levelBtn medium" onclick="onChooseLvl(this)">Medium</button>
+            <button class="levelBtn expert" onclick="onChooseLvl(this)">Expert</button>
+        </div>
+        <div class="table mineBg">
+            <table class="minesTable">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="table hintsBg">
+            <div class="hintSpace1" onclick='hintClicked(this)'></div>
+            <div class="hintSpace2" onclick='hintClicked(this)'></div>
+            <div class="hintSpace3" onclick='hintClicked(this)'></div>
+        </div>
+        <button class="safeClickBtn" onclick='safeClick()'>Safe Click <br><span class="safeClickBtnSub"><span class="safeClickAvb">3</span> clicks available</span></button>
+        <button class="undoBtn safeClickBtn" onclick='undo()'>UNDO</button>
+        <div class="myName">Made by Ohad Elias</div>
+    </div>
 
 
     <script src="js/main.js"></script>
